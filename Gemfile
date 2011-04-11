@@ -16,6 +16,7 @@ gem 'rmagick', :require => 'RMagick2'
 gem 'pdfkit'
 
 group :development, :test do
+  gem 'rcov'
   gem 'cucumber-rails'
   gem 'sqlite3'
   gem 'rspec-rails'

@@ -22,3 +22,5 @@ public/summary_reports
 public/images/logo.jpg
 tmp/
 public/reports
+coverage.data
+cuc_coverage
