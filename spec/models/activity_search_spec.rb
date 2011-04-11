@@ -152,4 +152,13 @@ describe ActivitySearch do
       @activity.should respond_to :keywords=
     end
   end
+  context "Delegations" do
+    before(:each) do
+      @activity = ActivitySearch.new
+    end
+    it "delegates #states_for to :summary_report" do
+      @activity.summary_report.should_receive :states_for
+      @activity.states_for
+    end
+  end
 end

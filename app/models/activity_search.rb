@@ -10,6 +10,8 @@ class ActivitySearch
                 :ta_delivery_method_id,:grant_activity_id, :state_id,
                 :ta_category_id, :collaborating_agency_id, :keywords
   
+  delegate :states_for, :to => :summary_report
+
   def initialize(attributes_hash={})
     attributes_hash.each do |attr, val|
       self.send("#{attr}=", val) if self.respond_to?("#{attr}=")
