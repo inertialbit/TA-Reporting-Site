@@ -11,21 +11,22 @@ class ReportsController < ApplicationController
     def load_report
       load_activities
       @summary_report = @search.summary_report
+      @state_totals = @summary_report.state_totals
       @report ||= Report.includes(:report_breakdowns).find(params[:id])
       
       @report.search = @search
       
       path_opts = {:format => :png}
       
-      @summary_map_path = build_map_url_for(@report, @search, path_opts, :period)
-      @ytd_summary_map_path = build_map_url_for(@report, @search, path_opts, :ytd)
+      @summary_map_path = build_map_path(@search, path_opts, :period)
+      @ytd_summary_map_path = build_map_path(@search, path_opts, :ytd)
     end
     
     def send_pdf_report
       unless @report.activities.empty?
         path_opts = {:format => :svg}
-        @ytd_summary_map_path = File.join(Rails.root.to_s, "public", build_map_url_for(@report, @search, path_opts, :ytd))
-        @summary_map_path = File.join(Rails.root.to_s, "public", build_map_url_for(@report, @search, path_opts, :period))
+        @ytd_summary_map_path = File.join(Rails.root.to_s, "public", build_map_path(@search, path_opts, :ytd))
+        @summary_map_path = File.join(Rails.root.to_s, "public", build_map_path(@search, path_opts, :period))
         @logo_path = File.join(Rails.root.to_s, "public", "images", "logo.jpg")
         converter = PDFConverter.new()
         html = render_to_string(:partial => 'shared/pdf_output')

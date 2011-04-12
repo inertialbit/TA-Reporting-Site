@@ -46,9 +46,11 @@ describe ReportsController do
     end
     context "with an :id => int, :view => Full" do
       let(:activity_search){ mock('ActivitySearch', {
-        :activities => mock('Relation')
+        :activities => mock('Period activities'),
+        :ytd_activities => mock('YTD activities')
       }) }
       let(:summary_report){ mock('SummaryReport', {
+        :state_totals => {},
         :start_date => Date.current.beginning_of_month,
         :end_date => Date.current.end_of_month
       }) }
@@ -78,11 +80,11 @@ describe ReportsController do
       end
       it "loads the @summary_map_path" do
         get :index, params
-        assigns(:summary_map_path).should eq map_report_path(report, map_params)
+        assigns(:summary_map_path).should eq state_map_path(map_params)
       end
       it "loads the @ytd_summary_map_path" do
         get :index, params
-        assigns(:ytd_summary_map_path).should eq map_report_path(report, map_params)
+        assigns(:ytd_summary_map_path).should eq state_map_path(map_params)
       end
       it "renders the show template" do
         get :index, params
@@ -249,11 +251,13 @@ describe ReportsController do
     let(:csv){ "one,two,three\nfour,five,six\n" }
     let(:activity_search) do
       mock('ActivitySearch', {
-        :activities => mock('Relation')
+        :activities => mock('Period activities'),
+        :ytd_activities => mock('YTD activities')
       })
     end
     let(:summary_report) do
       mock('SummaryReport', {
+        :state_totals => {},
         :start_date => Date.current.beginning_of_month,
         :end_date => Date.current.end_of_month
       })

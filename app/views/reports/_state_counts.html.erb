@@ -1,9 +1,8 @@
-<% @summary_report.state_stats_by_intensity_level_and_grant_activity.each do |intensity_level, grant_activities| %>
+<% @summary_report.state_counts.each do |intensity_level, grant_activities| %>
   <tr>
     <td colspan="3"><%= intensity_level %></td>
   </tr>
   <% grant_activities.each do |grant_activity, stats| %>
-    <% next if grant_activity == :activity_count %>
     <tr>
       <td style="padding-left: 30px;">
         <%= stats[:period_activity_count] %>x

@@ -1,10 +1,10 @@
 <tr>
   <td style="border-top: 1px solid #333;" class="small_title">
     <strong>Total Number of States receiving some type of TA during <%= @search.period %></strong><br/>
-    <em>States: <%= @search.summary_report.period_states.map(&:abbreviation).to_sentence %></em>
+    <em>States: <%= @state_totals[:period_state_sentence] %></em>
   </td>
   <td style="border-top: 1px solid #333;" class="count">
-    <%= @search.summary_report.period_state_count %>
+    <%= @state_totals[:period_state_count] %>
   </td>
   <td style="border-top: 1px solid #333" class="count">
   </td>
@@ -12,11 +12,11 @@
 <tr>
   <td style="border-top: 1px solid #333;" class="small_title">
     <strong>Total Number of States receiving some type of TA during <%= @search.ytd_period %></strong><br/>
-    <em>States: <%= @search.summary_report.ytd_states.map(&:abbreviation).to_sentence %></em>
+    <em>States: <%= @state_totals[:ytd_state_sentence] %></em>
   </td>
   <td style="border-top: 1px solid #333">
   </td>
   <td style="border-top: 1px solid #333" class="count">
-    <%= @search.summary_report.ytd_state_count %>
+    <%= @state_totals[:ytd_state_count] %>
   </td>
 </tr>

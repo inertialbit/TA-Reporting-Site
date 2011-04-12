@@ -60,39 +60,69 @@ public
     end
   end
   
-  def state_stats_by_intensity_level_and_grant_activity
+  #def state_stats_by_intensity_level_and_grant_activity(&block)
+  def state_activities(&block)
     conditions = {}
-    stats = {}
     intensity_levels = IntensityLevel.all
     grant_activities = GrantActivity.all
     
     intensity_levels.each do |intensity_level|
       conditions.delete(:grant_activity)
       conditions.merge!({:intensity_level_id => intensity_level.id})
-      stats[intensity_level.name] = {:activity_count => period_activities.like(conditions).count}
       
-      next if ytd_activities.like(conditions).count == 0
+      ytd_grouped_activities = ytd_activities.like(conditions)
+      ytd_grouped_states     = states_for(ytd_grouped_activities)
+      
+      next unless ytd_grouped_states.count > 0
       
       grant_activities.each do |grant_activity|
-        
         conditions.merge!({:grant_activity => grant_activity})
         
-        next if ytd_activities.like(conditions).count == 0
-
-        states = states_for(period_activities.like(conditions))
-        ytd_group_state_count = states_for(ytd_activities.like(conditions)).count
-
-        next if ytd_group_state_count == 0
+        ytd_grouped_activities    = ytd_activities.like(conditions)
+        ytd_grouped_states        = states_for(ytd_grouped_activities)
         
-        states_sentence = states.map(&:abbreviation).to_sentence
+        next unless ytd_grouped_states.count > 0
         
-        stats[intensity_level.name][grant_activity.name] = {
-          :period_activity_count => period_activities.like(conditions).count,
-          :period_state_sentence => states_sentence,
-          :period_state_count => states.count,
-          :ytd_state_count => ytd_group_state_count
-        }
+        period_grouped_activities = period_activities.like(conditions)
+        period_grouped_states     = states_for(period_grouped_activities)
+        
+        yield({
+          :intensity_level => intensity_level,
+          :grant_activity => grant_activity,
+          :period_states => period_grouped_states,
+          :period_activities => period_grouped_activities,
+          :ytd_states => ytd_grouped_states,
+          :ytd_activities => ytd_grouped_activities
+        })
       end
+    end
+  end
+  
+  def state_totals
+    {
+      :period_state_sentence => states_for(period_activities).map(&:abbreviation).to_sentence,
+      :period_state_count => states_for(period_activities).count,
+      :ytd_state_sentence => states_for(ytd_activities).map(&:abbreviation).to_sentence,
+      :ytd_state_count => states_for(ytd_activities).count
+    }
+  end
+  
+  def state_counts
+    stats = {}
+    state_activities do |state_activity|
+      intensity_level           = state_activity[:intensity_level].name
+      grant_activity            = state_activity[:grant_activity].name
+      period_grouped_activities = state_activity[:period_activities]
+      period_grouped_states     = state_activity[:period_states]
+      ytd_grouped_states        = state_activity[:ytd_states]
+      
+      stats[intensity_level] ||= {}
+      stats[intensity_level][grant_activity] = {
+        :period_activity_count => period_grouped_activities.count,
+        :period_state_sentence => period_grouped_states.map(&:abbreviation).to_sentence,
+        :period_state_count => period_grouped_states.count,
+        :ytd_state_count => ytd_grouped_states.count
+      }
     end
     
     # remove intensity_level keys pointing to empty values ie w/ no activities
@@ -104,5 +134,6 @@ public
     dirty_stats.each do |k,v|
       stats.delete(k) if v.empty?
     end
+    stats
   end
 end
